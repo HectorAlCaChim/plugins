@@ -4,7 +4,7 @@ from rest_framework.permissions import IsAuthenticated
 
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 
-from openedx.plugins.custom_api.services.course_service import CourseService
+from custom_api.services.course_service import CourseService
 
 class CoursesAPIView(APIView):
 

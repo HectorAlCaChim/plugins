@@ -1,6 +1,6 @@
 from django.urls import path
 
-from openedx.plugins.custom_api.views.courses import (
+from custom_api.views.courses import (
     CoursesAPIView,
     CourseNamesAPIView,
     ActiveCoursesAPIView
