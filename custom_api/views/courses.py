@@ -7,10 +7,6 @@ from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthenticat
 from custom_api.services.course_service import CourseService
 
 class CoursesAPIView(APIView):
-
-    authentication_classes = [JwtAuthentication]
-    permission_classes = [IsAuthenticated]
-
     def get(self, request):
 
         return Response({
