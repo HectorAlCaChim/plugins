@@ -135,3 +135,20 @@ tutor local start -d
 tutor config save --set DOCKER_IMAGE_OPENEDX=local/openedx-custom:2
 4. Volver a aplicar
   tutor local restart lms cms lms-worker cms-worker
+5. RECREAR PARA ACEPTAR CAMBIOS
+  tutor local start -d
+6. Validar uso de nuevo contenedor en version
+   docker ps --format "table {{.Names}}\t{{.Image}}" | grep -E "lms|cms"
+
+# VER VERSIONES NUEVAS O CAMBIAR DE VERSIONES
+1. Ver Versiones disponibles
+  docker images | grep openedx-custom
+2. Ver version actula aplicado
+  tutor config printvalue DOCKER_IMAGE_OPENEDX 
+3. Volver a la version Anterior
+  tutor config save --set DOCKER_IMAGE_OPENEDX=local/openedx-custom:1
+  tutor local start -d
+
+# RESTAURAR A LA VERSION ORIGINAL
+tutor config save --set DOCKER_IMAGE_OPENEDX=docker.io/overhangio/openedx:21.0.8-indigo
+tutor local start -d
