@@ -472,98 +472,98 @@ class UserService:
             }
     @staticmethod
     def get_all_users():
-    """
-    Obtiene todos los usuarios registrados
-    en Open edX.
+        """
+        Obtiene todos los usuarios registrados
+        en Open edX.
 
-    Incluye roles globales y de cursos.
-    """
+        Incluye roles globales y de cursos.
+        """
 
-    try:
+        try:
 
-        users = User.objects.all().order_by("username")
+            users = User.objects.all().order_by("username")
 
-        if not users.exists():
+            if not users.exists():
+
+                return {
+                    "success": False,
+                    "status": 404,
+                    "message": "No users found"
+                }
+
+            data = []
+
+            for user in users:
+
+                roles = []
+
+                #
+                # Todo usuario se considera student.
+                #
+                roles.append("student")
+
+                if user.is_staff:
+                    roles.append("staff")
+
+                if user.is_superuser:
+                    roles.append("superuser")
+
+                try:
+
+                    has_instructor_role = (
+                        CourseInstructorRole.objects.filter(
+                            users=user
+                        ).exists()
+                    )
+
+                    if has_instructor_role:
+                        roles.append("instructor")
+
+                except Exception:
+                    pass
+
+                try:
+
+                    has_course_staff_role = (
+                        CourseStaffRole.objects.filter(
+                            users=user
+                        ).exists()
+                    )
+
+                    if (
+                        has_course_staff_role and
+                        "course_staff" not in roles
+                    ):
+                        roles.append("course_staff")
+
+                except Exception:
+                    pass
+
+                data.append({
+                    "id": user.id,
+                    "userName": user.username,
+                    "email": user.email,
+                    "firstName": user.first_name,
+                    "lastName": user.last_name,
+                    "isSuperuser": user.is_superuser,
+                    "isStaff": user.is_staff,
+                    "isActive": user.is_active,
+                    "lastLogin": user.last_login,
+                    "dateJoined": user.date_joined,
+                    "roles": roles
+                })
+
+            return {
+                "success": True,
+                "status": 200,
+                "count": len(data),
+                "data": data
+            }
+
+        except Exception as ex:
 
             return {
                 "success": False,
-                "status": 404,
-                "message": "No users found"
+                "status": 500,
+                "message": str(ex)
             }
-
-        data = []
-
-        for user in users:
-
-            roles = []
-
-            #
-            # Todo usuario se considera student.
-            #
-            roles.append("student")
-
-            if user.is_staff:
-                roles.append("staff")
-
-            if user.is_superuser:
-                roles.append("superuser")
-
-            try:
-
-                has_instructor_role = (
-                    CourseInstructorRole.objects.filter(
-                        users=user
-                    ).exists()
-                )
-
-                if has_instructor_role:
-                    roles.append("instructor")
-
-            except Exception:
-                pass
-
-            try:
-
-                has_course_staff_role = (
-                    CourseStaffRole.objects.filter(
-                        users=user
-                    ).exists()
-                )
-
-                if (
-                    has_course_staff_role and
-                    "course_staff" not in roles
-                ):
-                    roles.append("course_staff")
-
-            except Exception:
-                pass
-
-            data.append({
-                "id": user.id,
-                "userName": user.username,
-                "email": user.email,
-                "firstName": user.first_name,
-                "lastName": user.last_name,
-                "isSuperuser": user.is_superuser,
-                "isStaff": user.is_staff,
-                "isActive": user.is_active,
-                "lastLogin": user.last_login,
-                "dateJoined": user.date_joined,
-                "roles": roles
-            })
-
-        return {
-            "success": True,
-            "status": 200,
-            "count": len(data),
-            "data": data
-        }
-
-    except Exception as ex:
-
-        return {
-            "success": False,
-            "status": 500,
-            "message": str(ex)
-        }
