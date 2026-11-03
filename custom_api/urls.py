@@ -1,9 +1,9 @@
 from django.urls import path
 
 from custom_api.views.courses import (
-    CoursesAPIView,
     CourseNamesAPIView,
-    ActiveCoursesAPIView
+    ActiveCoursesAPIView,
+    SearchCoursesAPIView
 )
 from custom_api.views.users import (
     UserStatusAPIView,
@@ -12,7 +12,8 @@ from custom_api.views.users import (
     UpdateUserAPIView,
     GetUserByEmailAPIView,
     GetUserByIdAPIView,
-    SearchUsersAPIView
+    SearchUsersAPIView,
+    UserPermissionsAPIView
 )
 from custom_api.views.instructors import (
     InstructorSearchAPIView
@@ -20,12 +21,12 @@ from custom_api.views.instructors import (
 urlpatterns = [
 
     path(
-        "courses/",
-        CoursesAPIView.as_view(),
-        name="courses"
+        "courses/search/",
+        SearchCoursesAPIView.as_view(),
+        name="courses_search"
     ),
     path(
-        "course-names/",
+        "courses/names/",
         CourseNamesAPIView.as_view(),
         name="course_names"
     ),
@@ -73,5 +74,10 @@ urlpatterns = [
         "users/search/",
         SearchUsersAPIView.as_view(),
         name="users_search"
+    ),
+    path(
+        "users/<int:user_id>/permissions/",
+        UserPermissionsAPIView.as_view(),
+        name="user_permissions"
     ),
 ]

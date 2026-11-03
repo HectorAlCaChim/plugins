@@ -6,36 +6,53 @@ from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthenticat
 
 from custom_api.services.course_service import CourseService
 
-class CoursesAPIView(APIView):
-    def get(self, request):
+class SearchCoursesAPIView(APIView):
 
-        return Response({
-            "success": True,
-            "message": "Courses endpoint funcionando"
-        })
-## SE COSULTA EL CATALOGO DE DISPLAY NAMES DE LOS CURSOS EXISTENTES##
-class CourseNamesAPIView(APIView):
     authentication_classes = [JwtAuthentication]
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
 
-        try:
+        result = CourseService.get_all_courses()
 
-            names = CourseService.get_unique_course_names()
+        if not result["success"]:
 
-            return Response({
-                "success": True,
-                "count": len(names),
-                "data": names
-            })
+            return Response(
+                {
+                    "success": False,
+                    "message": result["message"]
+                },
+                status=result["status"]
+            )
 
-        except Exception as ex:
+        return Response(
+            result["data"],
+            status=200
+        )
+## SE COSULTA EL CATALOGO DE DISPLAY NAMES DE LOS CURSOS EXISTENTES##
+class CourseNamesAPIView(APIView):
 
-            return Response({
-                "success": False,
-                "message": str(ex)
-            }, status=500)
+    authentication_classes = [JwtAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+
+        result = CourseService.get_unique_course_names()
+
+        if not result["success"]:
+
+            return Response(
+                {
+                    "success": False,
+                    "message": result["message"]
+                },
+                status=result["status"]
+            )
+
+        return Response(
+            result["data"],
+            status=200
+        )
 
 #SE CONSULTAN TODOS LOS CURSOS ACTIVOS SEGUN UNA REGLA DEFINIDA
 class ActiveCoursesAPIView(APIView):

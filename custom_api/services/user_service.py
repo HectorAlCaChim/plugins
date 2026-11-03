@@ -567,3 +567,53 @@ class UserService:
                 "status": 500,
                 "message": str(ex)
             }
+
+    @staticmethod
+    def has_course_admin_permissions(user_id):
+        """
+        Valida si un usuario posee permisos administrativos
+        relacionados con la gestión de cursos.
+        """
+
+        try:
+
+            user = User.objects.filter(
+                id=user_id
+            ).first()
+
+            if not user:
+
+                return {
+                    "success": False,
+                    "status": 404,
+                    "message": "User not found"
+                }
+
+            permissions = [
+                "content.courseoverview.add_courseoverview",
+                "content.courseoverview.change_courseoverview",
+                "content.courseoverview.delete_courseoverview",
+                "content.courseoverview.view_courseoverview"
+            ]
+
+            has_permission = any(
+                user.has_perm(permission)
+                for permission in permissions
+            )
+
+            return {
+                "success": True,
+                "status": 200,
+                "data": {
+                    "userId": user.id,
+                    "hasPermission": has_permission
+                }
+            }
+
+        except Exception as ex:
+
+            return {
+                "success": False,
+                "status": 500,
+                "message": str(ex)
+            }

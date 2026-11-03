@@ -230,3 +230,39 @@ class SearchUsersAPIView(APIView):
             result["data"],
             status=200
         )
+
+class UserPermissionsAPIView(APIView):
+
+    authentication_classes = [JwtAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, user_id):
+
+        if not request.user.is_staff:
+
+            return Response(
+                {
+                    "success": False,
+                    "message": "Permission denied"
+                },
+                status=403
+            )
+
+        result = UserService.has_course_admin_permissions(
+            user_id
+        )
+
+        if not result["success"]:
+
+            return Response(
+                {
+                    "success": False,
+                    "message": result["message"]
+                },
+                status=result["status"]
+            )
+
+        return Response(
+            result["data"],
+            status=200
+        )
