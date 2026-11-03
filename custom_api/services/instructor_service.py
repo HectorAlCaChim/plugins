@@ -100,3 +100,4 @@ class InstructorService:
                 "status": 500,
                 "message": str(ex)
             }
+

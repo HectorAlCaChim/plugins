@@ -179,4 +179,99 @@ class CourseService:
                 active_courses.append(course)
 
         return active_courses
+
+    @staticmethod
+    def get_courses_by_display_names(workshop_names):
+        """
+        Obtiene los cursos cuyos display_name coinciden
+        exactamente con los nombres recibidos.
+
+        Los resultados se ordenan por fecha de inicio
+        ascendente.
+        """
+
+        try:
+
+            if workshop_names is None:
+                return {
+                    "success": False,
+                    "status": 400,
+                    "message": "workshopNames is required"
+                }
+
+            #
+            # Requerimiento:
+            # Lista vacía = colección vacía.
+            #
+            if len(workshop_names) == 0:
+                return {
+                    "success": True,
+                    "status": 200,
+                    "count": 0,
+                    "data": []
+                }
+
+            courses = (
+                CourseOverview.objects
+                .filter(
+                    display_name__in=workshop_names
+                )
+                .order_by("start")
+            )
+
+            if not courses.exists():
+
+                return {
+                    "success": False,
+                    "status": 404,
+                    "message": "No courses found"
+                }
+
+            data = []
+
+            for course in courses:
+
+                data.append({
+                    "id": str(course.id),
+                    "displayName": course.display_name,
+                    "shortDescription": getattr(
+                        course,
+                        "short_description",
+                        None
+                    ),
+                    "version": getattr(
+                        course,
+                        "version",
+                        None
+                    ),
+                    "start": course.start,
+                    "end": course.end,
+                    "enrollmentStart": course.enrollment_start,
+                    "enrollmentEnd": course.enrollment_end,
+                    "created": getattr(
+                        course,
+                        "created",
+                        None
+                    ),
+                    "modified": getattr(
+                        course,
+                        "modified",
+                        None
+                    )
+                })
+
+            return {
+                "success": True,
+                "status": 200,
+                "count": len(data),
+                "data": data
+            }
+
+        except Exception as ex:
+
+            return {
+                "success": False,
+                "status": 500,
+                "message": str(ex)
+            }
     

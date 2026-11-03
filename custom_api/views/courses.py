@@ -32,8 +32,8 @@ class SearchCoursesAPIView(APIView):
 ## SE COSULTA EL CATALOGO DE DISPLAY NAMES DE LOS CURSOS EXISTENTES##
 class CourseNamesAPIView(APIView):
 
-    #authentication_classes = [JwtAuthentication]
-    #permission_classes = [IsAuthenticated]
+    authentication_classes = [OAuth2Authentication]
+    permission_classes = [IsAuthenticated]
 
     def get(self, request):
 
@@ -56,8 +56,8 @@ class CourseNamesAPIView(APIView):
 
 #SE CONSULTAN TODOS LOS CURSOS ACTIVOS SEGUN UNA REGLA DEFINIDA
 class ActiveCoursesAPIView(APIView):
-    #authentication_classes = [JwtAuthentication]
-    #permission_classes = [IsAuthenticated]
+    authentication_classes = [OAuth2Authentication]
+    permission_classes = [IsAuthenticated]
     
     def get(self, request):
 
@@ -97,3 +97,36 @@ class ActiveCoursesAPIView(APIView):
             "count": len(data),
             "data": data
         })
+
+class CoursesByDisplayNamesAPIView(APIView):
+
+    authentication_classes = [OAuth2Authentication]
+    permission_classes = [IsAuthenticated]
+
+
+    def post(self, request):
+
+        workshop_names = request.data.get(
+            "workshopNames"
+        )
+
+        result = (
+            CourseService.get_courses_by_display_names(
+                workshop_names
+            )
+        )
+
+        if not result["success"]:
+
+            return Response(
+                {
+                    "success": False,
+                    "message": result["message"]
+                },
+                status=result["status"]
+            )
+
+        return Response(
+            result["data"],
+            status=200
+        )

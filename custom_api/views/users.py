@@ -3,7 +3,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 
 from rest_framework.permissions import AllowAny
-
+from oauth2_provider.contrib.rest_framework import OAuth2Authentication
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 
 from custom_api.services.user_service import UserService
@@ -22,8 +22,8 @@ class AuthDebugView(APIView):
 
 class UserStatusAPIView(APIView):
 
-    #authentication_classes = [JwtAuthentication]
-    #permission_classes = [IsAuthenticated]
+    authentication_classes = [OAuth2Authentication]
+    permission_classes = [IsAuthenticated]
 
     def patch(self, request, user_id):
 
@@ -52,8 +52,8 @@ class UserStatusAPIView(APIView):
 
 class BulkUserStatusAPIView(APIView):
 
-    #authentication_classes = [JwtAuthentication]
-    #permission_classes = [IsAuthenticated]
+    authentication_classes = [OAuth2Authentication]
+    permission_classes = [IsAuthenticated]
 
     def patch(self, request):
 
@@ -75,8 +75,8 @@ class BulkUserStatusAPIView(APIView):
 
 class CreateUserAPIView(APIView):
 
-    #authentication_classes = [JwtAuthentication]
-    #permission_classes = [IsAuthenticated]
+    authentication_classes = [OAuth2Authentication]
+    permission_classes = [IsAuthenticated]
 
     def post(self, request):
 
@@ -107,8 +107,8 @@ class CreateUserAPIView(APIView):
 
 class UpdateUserAPIView(APIView):
 
-    #authentication_classes = [JwtAuthentication]
-    #permission_classes = [IsAuthenticated]
+    authentication_classes = [OAuth2Authentication]
+    permission_classes = [IsAuthenticated]
 
     def put(self, request, user_id):
 
@@ -141,8 +141,8 @@ class UpdateUserAPIView(APIView):
 
 class GetUserByEmailAPIView(APIView):
 
-    #authentication_classes = [JwtAuthentication]
-    #permission_classes = [IsAuthenticated]
+    authentication_classes = [OAuth2Authentication]
+    permission_classes = [IsAuthenticated]
 
     def get(self, request):
 
@@ -212,8 +212,8 @@ class GetUserByIdAPIView(APIView):
 
 class SearchUsersAPIView(APIView):
 
-    #authentication_classes = [JwtAuthentication]
-    #permission_classes = [IsAuthenticated]
+    authentication_classes = [OAuth2Authentication]
+    permission_classes = [IsAuthenticated]
 
     def get(self, request):
 
@@ -246,8 +246,8 @@ class SearchUsersAPIView(APIView):
 
 class UserPermissionsAPIView(APIView):
 
-    #authentication_classes = [JwtAuthentication]
-    #permission_classes = [IsAuthenticated]
+    authentication_classes = [OAuth2Authentication]
+    permission_classes = [IsAuthenticated]
 
     def get(self, request, user_id):
 
@@ -263,6 +263,39 @@ class UserPermissionsAPIView(APIView):
 
         result = UserService.has_course_admin_permissions(
             user_id
+        )
+
+        if not result["success"]:
+
+            return Response(
+                {
+                    "success": False,
+                    "message": result["message"]
+                },
+                status=result["status"]
+            )
+
+        return Response(
+            result["data"],
+            status=200
+        )
+
+class UserCourseAccessRolesAPIView(APIView):
+
+    authentication_classes = [OAuth2Authentication]
+    permission_classes = [IsAuthenticated]
+    
+    def get(self, request, user_id):
+
+        roles = request.GET.getlist(
+            "role"
+        )
+
+        result = (
+            UserService.get_course_access_roles(
+                user_id=user_id,
+                roles_filter=roles
+            )
         )
 
         if not result["success"]:
