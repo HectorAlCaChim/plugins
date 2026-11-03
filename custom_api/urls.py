@@ -13,13 +13,18 @@ from custom_api.views.users import (
     GetUserByEmailAPIView,
     GetUserByIdAPIView,
     SearchUsersAPIView,
-    UserPermissionsAPIView
+    UserPermissionsAPIView,
+    AuthDebugView
 )
 from custom_api.views.instructors import (
     InstructorSearchAPIView
 )
 urlpatterns = [
-
+    path(
+        'api/custom/debug/auth',
+        AuthDebugView.as_view(),
+        name='auth-debug'
+    ),
     path(
         "courses/search/",
         SearchCoursesAPIView.as_view(),

@@ -2,10 +2,23 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 
+from rest_framework.permissions import AllowAny
+
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 
 from custom_api.services.user_service import UserService
 
+
+class AuthDebugView(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        return Response({
+            "authorization_header": request.headers.get("Authorization"),
+            "meta_authorization": request.META.get("HTTP_AUTHORIZATION"),
+            "user": str(request.user),
+            "is_authenticated": request.user.is_authenticated
+        })
 
 class UserStatusAPIView(APIView):
 
