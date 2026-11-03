@@ -473,13 +473,18 @@ class UserService:
                 "status": 500,
                 "message": str(ex)
             }
+    
     @staticmethod
     def get_all_users():
         """
-        Obtiene todos los usuarios registrados
-        en Open edX.
+        Obtiene todos los usuarios registrados en Open edX.
 
-        Incluye roles globales y de cursos.
+        Incluye:
+        - Roles globales
+        - Roles de cursos
+
+        Se devuelven separados para permitir filtros
+        equivalentes a student_courseaccessrole.
         """
 
         try:
@@ -487,60 +492,80 @@ class UserService:
             users = User.objects.all().order_by("username")
 
             if not users.exists():
-
                 return {
                     "success": False,
                     "status": 404,
                     "message": "No users found"
                 }
 
+            instructor_users = set()
+            course_staff_users = set()
+
+            #
+            # Obtener usuarios con rol instructor
+            # en una sola consulta
+            #
+            try:
+                if CourseInstructorRole:
+                    instructor_users = set(
+                        CourseInstructorRole.objects.values_list(
+                            "users__id",
+                            flat=True
+                        )
+                    )
+            except Exception:
+                instructor_users = set()
+
+            #
+            # Obtener usuarios con rol course_staff
+            # en una sola consulta
+            #
+            try:
+                if CourseStaffRole:
+                    course_staff_users = set(
+                        CourseStaffRole.objects.values_list(
+                            "users__id",
+                            flat=True
+                        )
+                    )
+            except Exception:
+                course_staff_users = set()
+
             data = []
 
             for user in users:
 
-                roles = []
+                global_roles = [
+                    "student"
+                ]
+
+                course_roles = []
 
                 #
-                # Todo usuario se considera student.
+                # Roles globales
                 #
-                roles.append("student")
-
                 if user.is_staff:
-                    roles.append("staff")
+                    global_roles.append("staff")
 
                 if user.is_superuser:
-                    roles.append("superuser")
+                    global_roles.append("superuser")
 
-                try:
+                #
+                # Roles de curso
+                #
+                if user.id in instructor_users:
+                    course_roles.append("instructor")
 
-                    has_instructor_role = (
-                        CourseInstructorRole.objects.filter(
-                            users=user
-                        ).exists()
-                    )
+                if user.id in course_staff_users:
+                    course_roles.append("course_staff")
 
-                    if has_instructor_role:
-                        roles.append("instructor")
-
-                except Exception:
-                    pass
-
-                try:
-
-                    has_course_staff_role = (
-                        CourseStaffRole.objects.filter(
-                            users=user
-                        ).exists()
-                    )
-
-                    if (
-                        has_course_staff_role and
-                        "course_staff" not in roles
-                    ):
-                        roles.append("course_staff")
-
-                except Exception:
-                    pass
+                #
+                # Compatibilidad hacia atrás
+                #
+                all_roles = (
+                    global_roles +
+                    course_roles
+                )
 
                 data.append({
                     "id": user.id,
@@ -553,7 +578,13 @@ class UserService:
                     "isActive": user.is_active,
                     "lastLogin": user.last_login,
                     "dateJoined": user.date_joined,
-                    "roles": roles
+
+                    # Nuevo
+                    "globalRoles": global_roles,
+                    "courseRoles": course_roles,
+
+                    # Compatibilidad
+                    "roles": all_roles
                 })
 
             return {
