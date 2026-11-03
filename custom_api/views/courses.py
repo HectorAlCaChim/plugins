@@ -8,8 +8,8 @@ from custom_api.services.course_service import CourseService
 
 class SearchCoursesAPIView(APIView):
 
-    #authentication_classes = [JwtAuthentication]
-    #permission_classes = [IsAuthenticated]
+    authentication_classes = [JwtAuthentication]
+    permission_classes = [IsAuthenticated]
 
     def get(self, request):
 
