@@ -8,8 +8,8 @@ from custom_api.services.course_service import CourseService
 
 class SearchCoursesAPIView(APIView):
 
-    authentication_classes = [JwtAuthentication]
-    permission_classes = [IsAuthenticated]
+    #authentication_classes = [JwtAuthentication]
+    #permission_classes = [IsAuthenticated]
 
     def get(self, request):
 
@@ -32,8 +32,8 @@ class SearchCoursesAPIView(APIView):
 ## SE COSULTA EL CATALOGO DE DISPLAY NAMES DE LOS CURSOS EXISTENTES##
 class CourseNamesAPIView(APIView):
 
-    authentication_classes = [JwtAuthentication]
-    permission_classes = [IsAuthenticated]
+    #authentication_classes = [JwtAuthentication]
+    #permission_classes = [IsAuthenticated]
 
     def get(self, request):
 
@@ -56,8 +56,8 @@ class CourseNamesAPIView(APIView):
 
 #SE CONSULTAN TODOS LOS CURSOS ACTIVOS SEGUN UNA REGLA DEFINIDA
 class ActiveCoursesAPIView(APIView):
-    authentication_classes = [JwtAuthentication]
-    permission_classes = [IsAuthenticated]
+    #authentication_classes = [JwtAuthentication]
+    #permission_classes = [IsAuthenticated]
     
     def get(self, request):
 
