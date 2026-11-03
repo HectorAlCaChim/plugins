@@ -22,8 +22,8 @@ class AuthDebugView(APIView):
 
 class UserStatusAPIView(APIView):
 
-    authentication_classes = [JwtAuthentication]
-    permission_classes = [IsAuthenticated]
+    #authentication_classes = [JwtAuthentication]
+    #permission_classes = [IsAuthenticated]
 
     def patch(self, request, user_id):
 
@@ -52,8 +52,8 @@ class UserStatusAPIView(APIView):
 
 class BulkUserStatusAPIView(APIView):
 
-    authentication_classes = [JwtAuthentication]
-    permission_classes = [IsAuthenticated]
+    #authentication_classes = [JwtAuthentication]
+    #permission_classes = [IsAuthenticated]
 
     def patch(self, request):
 
@@ -75,8 +75,8 @@ class BulkUserStatusAPIView(APIView):
 
 class CreateUserAPIView(APIView):
 
-    authentication_classes = [JwtAuthentication]
-    permission_classes = [IsAuthenticated]
+    #authentication_classes = [JwtAuthentication]
+    #permission_classes = [IsAuthenticated]
 
     def post(self, request):
 
@@ -107,8 +107,8 @@ class CreateUserAPIView(APIView):
 
 class UpdateUserAPIView(APIView):
 
-    authentication_classes = [JwtAuthentication]
-    permission_classes = [IsAuthenticated]
+    #authentication_classes = [JwtAuthentication]
+    #permission_classes = [IsAuthenticated]
 
     def put(self, request, user_id):
 
@@ -141,8 +141,8 @@ class UpdateUserAPIView(APIView):
 
 class GetUserByEmailAPIView(APIView):
 
-    authentication_classes = [JwtAuthentication]
-    permission_classes = [IsAuthenticated]
+    #authentication_classes = [JwtAuthentication]
+    #permission_classes = [IsAuthenticated]
 
     def get(self, request):
 
@@ -176,8 +176,8 @@ class GetUserByEmailAPIView(APIView):
 
 class GetUserByIdAPIView(APIView):
 
-    authentication_classes = [JwtAuthentication]
-    permission_classes = [IsAuthenticated]
+    #authentication_classes = [JwtAuthentication]
+    #permission_classes = [IsAuthenticated]
 
     def get(self, request):
 
@@ -212,8 +212,8 @@ class GetUserByIdAPIView(APIView):
 
 class SearchUsersAPIView(APIView):
 
-    authentication_classes = [JwtAuthentication]
-    permission_classes = [IsAuthenticated]
+    #authentication_classes = [JwtAuthentication]
+    #permission_classes = [IsAuthenticated]
 
     def get(self, request):
 
@@ -246,8 +246,8 @@ class SearchUsersAPIView(APIView):
 
 class UserPermissionsAPIView(APIView):
 
-    authentication_classes = [JwtAuthentication]
-    permission_classes = [IsAuthenticated]
+    #authentication_classes = [JwtAuthentication]
+    #permission_classes = [IsAuthenticated]
 
     def get(self, request, user_id):
 
