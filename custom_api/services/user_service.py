@@ -21,6 +21,246 @@ User = get_user_model()
 class UserService:
 
     @staticmethod
+    def create_profile(
+        user_id,
+        name
+    ):
+        """
+        Crea el registro UserProfile para un usuario.
+
+        Regla:
+        - Si ya existe UserProfile => 409 Conflict
+        """
+
+        if not name:
+
+            return {
+                "success": False,
+                "status": 400,
+                "message": "name is required"
+            }
+
+        try:
+
+            user = User.objects.filter(
+                id=user_id
+            ).first()
+
+            if not user:
+
+                return {
+                    "success": False,
+                    "status": 404,
+                    "message": "User not found"
+                }
+
+            if not UserProfile:
+
+                return {
+                    "success": False,
+                    "status": 503,
+                    "message": "UserProfile service unavailable"
+                }
+
+            existing_profile = UserProfile.objects.filter(
+                user=user
+            ).first()
+
+            if existing_profile:
+
+                return {
+                    "success": False,
+                    "status": 409,
+                    "message": "User profile already exists"
+                }
+
+            profile = UserProfile.objects.create(
+                user=user,
+                name=name
+            )
+
+            return {
+                "success": True,
+                "status": 200,
+                "data": {
+                    "id": user.id,
+                    "name": profile.name,
+                    "meta": getattr(
+                        profile,
+                        "meta",
+                        ""
+                    ),
+                    "courseware": getattr(
+                        profile,
+                        "courseware",
+                        ""
+                    ),
+                    "language": getattr(
+                        profile,
+                        "language",
+                        ""
+                    ),
+                    "location": getattr(
+                        profile,
+                        "location",
+                        ""
+                    )
+                }
+            }
+
+        except Exception as ex:
+
+            return {
+                "success": False,
+                "status": 500,
+                "message": str(ex)
+            }
+
+    @staticmethod
+    def get_profile(user_id):
+        """
+        Obtiene la información del perfil de un usuario.
+        """
+
+        try:
+
+            if not user_id:
+
+                return {
+                    "success": False,
+                    "status": 400,
+                    "message": "userId is required"
+                }
+
+            user = User.objects.filter(
+                id=user_id
+            ).first()
+
+            if not user:
+
+                return {
+                    "success": False,
+                    "status": 404,
+                    "message": "User not found"
+                }
+
+            if not UserProfile:
+
+                return {
+                    "success": False,
+                    "status": 503,
+                    "message": "UserProfile service unavailable"
+                }
+
+            profile = UserProfile.objects.filter(
+                user=user
+            ).first()
+
+            if not profile:
+
+                return {
+                    "success": False,
+                    "status": 404,
+                    "message": "Profile not found"
+                }
+
+            return {
+                "success": True,
+                "status": 200,
+                "data": {
+                    "id": user.id,
+                    "name": profile.name,
+                    "meta": profile.meta,
+                    "courseware": profile.courseware,
+                    "language": profile.language,
+                    "location": profile.location
+                }
+            }
+
+        except Exception as ex:
+
+            return {
+                "success": False,
+                "status": 500,
+                "message": str(ex)
+            }
+
+    @staticmethod
+    def update_profile_name(
+        user_id,
+        name
+    ):
+        """
+        Actualiza el nombre del perfil de un usuario.
+        """
+
+        if not name:
+
+            return {
+                "success": False,
+                "status": 400,
+                "message": "name is required"
+            }
+
+        try:
+
+            user = User.objects.filter(
+                id=user_id
+            ).first()
+
+            if not user:
+
+                return {
+                    "success": False,
+                    "status": 404,
+                    "message": "User not found"
+                }
+
+            if not UserProfile:
+
+                return {
+                    "success": False,
+                    "status": 503,
+                    "message": "UserProfile service unavailable"
+                }
+
+            profile = UserProfile.objects.filter(
+                user=user
+            ).first()
+
+            if not profile:
+
+                return {
+                    "success": False,
+                    "status": 404,
+                    "message": "Profile not found"
+                }
+
+            profile.name = name
+
+            profile.save(
+                update_fields=["name"]
+            )
+
+            return {
+                "success": True,
+                "status": 200,
+                "data": {
+                    "userId": user.id,
+                    "name": profile.name,
+                    "message": "Profile updated"
+                }
+            }
+
+        except Exception as ex:
+
+            return {
+                "success": False,
+                "status": 500,
+                "message": str(ex)
+            }
+
+    @staticmethod
     def update_user_status(user_id, is_active):
         try:
             user = User.objects.filter(id=user_id).first()

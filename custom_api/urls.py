@@ -19,12 +19,33 @@ from custom_api.views.users import (
     UserPermissionsAPIView,
     AuthDebugView,
     UserCourseAccessRolesAPIView,
-    UserPasswordAPIView
+    UserPasswordAPIView,
+    UserProfileDetailAPIView,
+    UserProfileCreateAPIView,
+    UserProfileUpdateAPIView
 )
 from custom_api.views.instructors import (
     InstructorSearchAPIView
 )
 urlpatterns = [
+    #18. Crear perfil de usuario
+    path(
+        "users/<int:user_id>/profile/",
+        UserProfileCreateAPIView.as_view(),
+        name="create_profile"
+    ),
+    #20. actualizar el nombre del perfil
+    path(
+        "users/<int:user_id>/profile/",
+        UserProfileUpdateAPIView.as_view(),
+        name="user_profile_update"
+    ),
+    #19. Consultar perfil de usuario
+    path(
+        "users/<int:user_id>/profile/",
+        UserProfileDetailAPIView.as_view(),
+        name="user_profile_detail"
+    ),
     path(
         'api/custom/debug/auth',
         AuthDebugView.as_view(),

@@ -20,6 +20,116 @@ class AuthDebugView(APIView):
             "is_authenticated": request.user.is_authenticated
         })
 
+class UserProfileCreateAPIView(APIView):
+
+    authentication_classes = [JwtAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, user_id):
+
+        if not request.user.is_staff:
+
+            return Response(
+                {
+                    "success": False,
+                    "message": "Permission denied"
+                },
+                status=403
+            )
+
+        result = UserService.create_profile(
+            user_id=user_id,
+            name=request.data.get("name")
+        )
+
+        if not result["success"]:
+
+            return Response(
+                {
+                    "success": False,
+                    "message": result["message"]
+                },
+                status=result["status"]
+            )
+
+        return Response(
+            result["data"],
+            status=200
+        )
+
+class UserProfileUpdateAPIView(APIView):
+
+    authentication_classes = [JwtAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def patch(self, request, user_id):
+
+        if not request.user.is_staff:
+
+            return Response(
+                {
+                    "success": False,
+                    "message": "Permission denied"
+                },
+                status=403
+            )
+
+        result = UserService.update_profile_name(
+            user_id=user_id,
+            name=request.data.get("name")
+        )
+
+        if not result["success"]:
+
+            return Response(
+                {
+                    "success": False,
+                    "message": result["message"]
+                },
+                status=result["status"]
+            )
+
+        return Response(
+            result["data"],
+            status=200
+        )
+
+class UserProfileDetailAPIView(APIView):
+
+    authentication_classes = [JwtAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, user_id):
+
+        if not request.user.is_staff:
+
+            return Response(
+                {
+                    "success": False,
+                    "message": "Permission denied"
+                },
+                status=403
+            )
+
+        result = UserService.get_profile(
+            user_id=user_id
+        )
+
+        if not result["success"]:
+
+            return Response(
+                {
+                    "success": False,
+                    "message": result["message"]
+                },
+                status=result["status"]
+            )
+
+        return Response(
+            result["data"],
+            status=200
+        )
+
 class UserStatusAPIView(APIView):
 
     authentication_classes = [OAuth2Authentication]

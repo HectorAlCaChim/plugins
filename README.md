@@ -152,3 +152,7 @@ tutor config save --set DOCKER_IMAGE_OPENEDX=local/openedx-custom:2
 # RESTAURAR A LA VERSION ORIGINAL
 tutor config save --set DOCKER_IMAGE_OPENEDX=docker.io/overhangio/openedx:21.0.8-indigo
 tutor local start -d
+
+# ESTABLECER PUENTE SSH PARA CONECTAR REMOTO BASE DE DATOS
+1 - docker inspect tutor_local-mysql-1 --format '{{range .NetworkSettings.Networks}}{{.IPAddress}} {{end}'
+2 - ssh -i "C:\pem\bwaulmo\bwaulmo.pem" -N -o ExitOnForwardFailure=yes -L 127.0.0.1:13306:172.18.0.8:3306 ubuntu@18.189.150.53
