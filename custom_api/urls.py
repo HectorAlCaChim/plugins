@@ -29,22 +29,12 @@ from custom_api.views.instructors import (
 )
 urlpatterns = [
     #18. Crear perfil de usuario
-    path(
-        "users/<int:user_id>/profile/",
-        UserProfileCreateAPIView.as_view(),
-        name="create_profile"
-    ),
     #20. actualizar el nombre del perfil
-    path(
-        "users/<int:user_id>/profile/",
-        UserProfileUpdateAPIView.as_view(),
-        name="user_profile_update"
-    ),
     #19. Consultar perfil de usuario
     path(
         "users/<int:user_id>/profile/",
-        UserProfileDetailAPIView.as_view(),
-        name="user_profile_detail"
+        UserProfileAPIView.as_view(),
+        name="user_profile"
     ),
     path(
         'api/custom/debug/auth',
@@ -106,7 +96,7 @@ urlpatterns = [
     ),
     #6. Solicitar información de un usuario por email
     path(
-        "users/",
+        "users/by-email/",
         GetUserByEmailAPIView.as_view(),
         name="get_user_by_email"
     ),

@@ -20,7 +20,17 @@ class AuthDebugView(APIView):
             "is_authenticated": request.user.is_authenticated
         })
 
-class UserProfileCreateAPIView(APIView):
+
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
+
+from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
+
+from custom_api.services.user_service import UserService
+
+
+class UserProfileAPIView(APIView):
 
     authentication_classes = [JwtAuthentication]
     permission_classes = [IsAuthenticated]
@@ -57,11 +67,6 @@ class UserProfileCreateAPIView(APIView):
             status=200
         )
 
-class UserProfileUpdateAPIView(APIView):
-
-    authentication_classes = [JwtAuthentication]
-    permission_classes = [IsAuthenticated]
-
     def patch(self, request, user_id):
 
         if not request.user.is_staff:
@@ -93,11 +98,6 @@ class UserProfileUpdateAPIView(APIView):
             result["data"],
             status=200
         )
-
-class UserProfileDetailAPIView(APIView):
-
-    authentication_classes = [JwtAuthentication]
-    permission_classes = [IsAuthenticated]
 
     def get(self, request, user_id):
 
