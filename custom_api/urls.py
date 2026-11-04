@@ -18,7 +18,8 @@ from custom_api.views.users import (
     SearchUsersAPIView,
     UserPermissionsAPIView,
     AuthDebugView,
-    UserCourseAccessRolesAPIView
+    UserCourseAccessRolesAPIView,
+    UserPasswordAPIView
 )
 from custom_api.views.instructors import (
     InstructorSearchAPIView
@@ -51,6 +52,12 @@ urlpatterns = [
         "active-courses/",
         ActiveCoursesAPIView.as_view(),
         name="active_courses"
+    ),
+    #2. Actulizar Contraseña
+    path(
+        "users/<int:user_id>/password/",
+        UserPasswordAPIView.as_view(),
+        name="user_password"
     ),
     #3. Actualizar estado del usuario
      path(

@@ -783,3 +783,58 @@ class UserService:
                 "status": 500,
                 "message": str(ex)
             }
+
+    @staticmethod
+    def update_password(
+        user_id,
+        password
+    ):
+        """
+        Actualiza la contraseña de un usuario
+        Open edX.
+        """
+
+        if not password:
+
+            return {
+                "success": False,
+                "status": 400,
+                "message": "password is required"
+            }
+
+        try:
+
+            user = User.objects.filter(
+                id=user_id
+            ).first()
+
+            if not user:
+
+                return {
+                    "success": False,
+                    "status": 404,
+                    "message": "User not found"
+                }
+
+            user.set_password(password)
+
+            user.save(
+                update_fields=["password"]
+            )
+
+            return {
+                "success": True,
+                "status": 200,
+                "data": {
+                    "userId": user.id,
+                    "message": "Password updated successfully"
+                }
+            }
+
+        except Exception as ex:
+
+            return {
+                "success": False,
+                "status": 500,
+                "message": str(ex)
+            }

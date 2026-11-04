@@ -312,3 +312,45 @@ class UserCourseAccessRolesAPIView(APIView):
             result["data"],
             status=200
         )
+
+class UserPasswordAPIView(APIView):
+
+    #authentication_classes = [JwtAuthentication]
+    #permission_classes = [IsAuthenticated]
+
+    authentication_classes = [OAuth2Authentication]
+    permission_classes = [IsAuthenticated]
+
+    def patch(self, request, user_id):
+
+        if not request.user.is_staff:
+
+            return Response(
+                {
+                    "success": False,
+                    "message": "Permission denied"
+                },
+                status=403
+            )
+
+        result = UserService.update_password(
+            user_id=user_id,
+            password=request.data.get(
+                "password"
+            )
+        )
+
+        if not result["success"]:
+
+            return Response(
+                {
+                    "success": False,
+                    "message": result["message"]
+                },
+                status=result["status"]
+            )
+
+        return Response(
+            result["data"],
+            status=200
+        )
