@@ -288,17 +288,19 @@ class GetUserByIdAPIView(APIView):
 
     #authentication_classes = [JwtAuthentication]
     #permission_classes = [IsAuthenticated]
+    authentication_classes = [OAuth2Authentication]
+    permission_classes = [IsAuthenticated]
 
     def get(self, request):
 
-        if not request.user.is_staff:
-            return Response(
-                {
-                    "success": False,
-                    "message": "Permission denied"
-                },
-                status=403
-            )
+        #if not request.user.is_staff:
+            #return Response(
+                #{
+                    #"success": False,
+                    #"message": "Permission denied"
+                #},
+                #status=403
+            #)
 
         user_id = request.GET.get("userId")
 
