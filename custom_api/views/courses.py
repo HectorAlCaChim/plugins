@@ -37,11 +37,6 @@ class CourseNamesAPIView(APIView):
 
     def get(self, request):
 
-        return Response({
-            "success": True,
-            "message": "ok"
-        })
-
         result = CourseService.get_unique_course_names()
 
         if not result["success"]:
