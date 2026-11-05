@@ -20,9 +20,7 @@ from custom_api.views.users import (
     AuthDebugView,
     UserCourseAccessRolesAPIView,
     UserPasswordAPIView,
-    UserProfileDetailAPIView,
-    UserProfileCreateAPIView,
-    UserProfileUpdateAPIView
+    UserProfileAPIView
 )
 from custom_api.views.instructors import (
     InstructorSearchAPIView
