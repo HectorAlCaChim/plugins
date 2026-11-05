@@ -256,14 +256,14 @@ class GetUserByEmailAPIView(APIView):
 
     def get(self, request):
 
-        if not request.user.is_staff:
-            return Response(
-                {
-                    "success": False,
-                    "message": "Permission denied"
-                },
-                status=403
-            )
+        #if not request.user.is_staff:
+            #return Response(
+                #{
+                    #"success": False,
+                    #"message": "Permission denied"
+                #},
+                #status=403
+            #)
 
         email = request.GET.get("email")
 

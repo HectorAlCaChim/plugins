@@ -2,6 +2,9 @@ from django.urls import path
 from custom_api.views.enrollments import (
     BulkCourseEnrollmentAPIView
 )
+from custom_api.views.grades import (
+    StudentGradesAPIView
+)
 from custom_api.views.courses import (
     CourseNamesAPIView,
     ActiveCoursesAPIView,
@@ -50,6 +53,12 @@ urlpatterns = [
         "courses/names/",
         CourseNamesAPIView.as_view(),
         name="course_names"
+    ),
+    #13. Consultar calificaciones de los cursos de un estudiante
+    path(
+        "grades/student/",
+        StudentGradesAPIView.as_view(),
+        name="student_grades"
     ),
     #16. Consultar cursos por nombre de taller
     path(
