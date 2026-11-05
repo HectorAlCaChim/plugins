@@ -32,7 +32,7 @@ from custom_api.services.user_service import UserService
 
 class UserProfileAPIView(APIView):
 
-    authentication_classes = [JwtAuthentication]
+    authentication_classes = [OAuth2Authentication]
     permission_classes = [IsAuthenticated]
 
     def post(self, request, user_id):
@@ -327,15 +327,15 @@ class SearchUsersAPIView(APIView):
 
     def get(self, request):
 
-        if not request.user.is_staff:
+        #if not request.user.is_staff:
 
-            return Response(
-                {
-                    "success": False,
-                    "message": "Permission denied"
-                },
-                status=403
-            )
+            #return Response(
+                #{
+                    #"success": False,
+                    #"message": "Permission denied"
+                #},
+                #status=403
+            #)
 
         result = UserService.get_all_users()
 
