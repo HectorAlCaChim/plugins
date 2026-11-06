@@ -149,6 +149,13 @@ tutor config save --set DOCKER_IMAGE_OPENEDX=local/openedx-custom:2
   tutor config save --set DOCKER_IMAGE_OPENEDX=local/openedx-custom:1
   tutor local start -d
 
+# VER EL CONSUMO DE SOLICITUDES DETRO DEL SERVIDOR DE OPEN EDX 
+1. Entrar al directorio del contenedor
+  cd ~/custom-image
+2. Ejecutar
+  tutor local logs lms -f
+
+
 # RESTAURAR A LA VERSION ORIGINAL
 tutor config save --set DOCKER_IMAGE_OPENEDX=docker.io/overhangio/openedx:21.0.8-indigo
 tutor local start -d
