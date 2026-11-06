@@ -71,10 +71,18 @@ class GradeService:
             for grade in grades:
 
                 data.append({
-                    "created": grade.created,
-                    "userId": grade.user_id,
-                    "courseId": grade.course_id,
-                    "percentGrade": grade.percent_grade,
+                    "created": (
+                        grade.created.isoformat()
+                        if grade.created
+                        else None
+                    ),
+                    "userId": int(grade.user_id),
+                    "courseId": str(grade.course_id),
+                    "percentGrade": (
+                        float(grade.percent_grade)
+                        if grade.percent_grade is not None
+                        else None
+                    ),
                     "letterGrade": grade.letter_grade
                 })
 
