@@ -1,7 +1,7 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
-
+from oauth2_provider.contrib.rest_framework import OAuth2Authentication
 from edx_rest_framework_extensions.auth.jwt.authentication import (
     JwtAuthentication
 )
@@ -13,13 +13,8 @@ from custom_api.services.instructor_service import (
 
 class InstructorSearchAPIView(APIView):
 
-    authentication_classes = [
-        JwtAuthentication
-    ]
-
-    permission_classes = [
-        IsAuthenticated
-    ]
+    authentication_classes = [OAuth2Authentication]
+    permission_classes = [IsAuthenticated]
 
     def post(self, request):
 
