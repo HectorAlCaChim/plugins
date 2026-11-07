@@ -3,7 +3,7 @@ from django.db import transaction
 from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
 from opaque_keys.edx.keys import CourseKey
-from student.models import CourseAccessRole
+from common.djangoapps.student.models import CourseAccessRole
 
 User = get_user_model()
 from common.djangoapps.student.roles import (
