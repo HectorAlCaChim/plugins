@@ -8,7 +8,6 @@ from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthenticat
 
 from custom_api.services.user_service import UserService
 
-
 class AuthDebugView(APIView):
     permission_classes = [AllowAny]
 
@@ -19,15 +18,6 @@ class AuthDebugView(APIView):
             "user": str(request.user),
             "is_authenticated": request.user.is_authenticated
         })
-
-
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
-
-from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
-
-from custom_api.services.user_service import UserService
 
 
 class UserProfileAPIView(APIView):
@@ -465,4 +455,30 @@ class UserPasswordAPIView(APIView):
         return Response(
             result["data"],
             status=200
+        )
+
+class CourseAccessRoleAPIView(APIView):
+
+    authentication_classes = [OAuth2Authentication]
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+
+        result = (
+            CourseAccessRoleService.add_course_access_role(
+                open_edx_user_id=request.data.get(
+                    "openEdxUserId"
+                ),
+                course_id=request.data.get(
+                    "courseId"
+                ),
+                role=request.data.get(
+                    "role"
+                )
+            )
+        )
+
+        return Response(
+            result,
+            status=result["status"]
         )

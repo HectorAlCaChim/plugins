@@ -23,7 +23,8 @@ from custom_api.views.users import (
     AuthDebugView,
     UserCourseAccessRolesAPIView,
     UserPasswordAPIView,
-    UserProfileAPIView
+    UserProfileAPIView,
+    CourseAccessRoleAPIView
 )
 from custom_api.views.instructors import (
     InstructorSearchAPIView
@@ -143,4 +144,9 @@ urlpatterns = [
         UserPermissionsAPIView.as_view(),
         name="user_permissions"
     ),
+    path(
+        "users/course-access-role/",
+        CourseAccessRoleAPIView.as_view(),
+        name="course_access_role"
+    )
 ]

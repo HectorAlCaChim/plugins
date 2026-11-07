@@ -3,6 +3,9 @@ from django.db import transaction
 from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
 from opaque_keys.edx.keys import CourseKey
+from student.models import CourseAccessRole
+
+User = get_user_model()
 from common.djangoapps.student.roles import (
     CourseInstructorRole,
     CourseStaffRole
@@ -1014,6 +1017,125 @@ class UserService:
                 "status": 200,
                 "count": len(assignments),
                 "data": assignments
+            }
+
+        except Exception as ex:
+
+            return {
+                "success": False,
+                "status": 500,
+                "message": str(ex)
+            }
+
+    @staticmethod
+    def add_course_access_role(
+        open_edx_user_id,
+        course_id,
+        role
+    ):
+        """
+        Asigna un rol de acceso a un curso.
+
+        Si el rol ya existe para el usuario y curso,
+        no se vuelve a insertar.
+        """
+
+        try:
+
+            if not open_edx_user_id:
+
+                return {
+                    "success": False,
+                    "status": 400,
+                    "message": "openEdxUserId is required"
+                }
+
+            if not course_id:
+
+                return {
+                    "success": False,
+                    "status": 400,
+                    "message": "courseId is required"
+                }
+
+            if not role:
+
+                return {
+                    "success": False,
+                    "status": 400,
+                    "message": "role is required"
+                }
+
+            user = User.objects.filter(
+                id=open_edx_user_id
+            ).first()
+
+            if user is None:
+
+                return {
+                    "success": False,
+                    "status": 404,
+                    "message": "User not found"
+                }
+
+            course_key = CourseKey.from_string(
+                course_id
+            )
+
+            role = role.lower()
+
+            #
+            # Validación previa
+            #
+            existing_role = (
+                CourseAccessRole.objects
+                .filter(
+                    user_id=open_edx_user_id,
+                    course_id=course_key,
+                    role=role
+                )
+                .first()
+            )
+
+            if existing_role:
+
+                return {
+                    "success": True,
+                    "status": 200,
+                    "message": "Role already assigned",
+                    "data": {
+                        "id": existing_role.id,
+                        "userId": existing_role.user_id,
+                        "courseId": str(
+                            existing_role.course_id
+                        ),
+                        "org": existing_role.org,
+                        "role": existing_role.role
+                    }
+                }
+
+            access_role = (
+                CourseAccessRole.objects.create(
+                    user_id=open_edx_user_id,
+                    course_id=course_key,
+                    role=role,
+                    org=course_key.org
+                )
+            )
+
+            return {
+                "success": True,
+                "status": 200,
+                "message": "Role assigned successfully",
+                "data": {
+                    "id": access_role.id,
+                    "userId": access_role.user_id,
+                    "courseId": str(
+                        access_role.course_id
+                    ),
+                    "org": access_role.org,
+                    "role": access_role.role
+                }
             }
 
         except Exception as ex:
