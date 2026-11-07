@@ -463,12 +463,12 @@ class UserPasswordAPIView(APIView):
 
     #authentication_classes = [JwtAuthentication]
     #permission_classes = [IsAuthenticated]
-    @swagger_auto_schema(
-        request_body=UserPasswordRequestSerializer
-    )
     authentication_classes = [OAuth2Authentication]
     permission_classes = [IsAuthenticated]
 
+    @swagger_auto_schema(
+        request_body=UserPasswordRequestSerializer
+    )
     def patch(self, request, user_id):
 
         if not request.user.is_staff:
