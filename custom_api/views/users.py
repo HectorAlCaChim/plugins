@@ -531,3 +531,47 @@ class CourseAccessRoleAPIView(APIView):
             result,
             status=result["status"]
         )
+
+class BulkUsersSharedCoursesAPIView(APIView):
+
+    authentication_classes = [
+        OAuth2Authentication
+    ]
+
+    permission_classes = [
+        IsAuthenticated
+    ]
+
+    def post(
+        self,
+        request
+    ):
+
+        result = (
+            EnrollmentService.bulk_by_users(
+                users=request.data.get(
+                    "users"
+                ),
+                action=request.data.get(
+                    "action"
+                ),
+                course_ids=request.data.get(
+                    "courseIds"
+                )
+            )
+        )
+
+        if not result["success"]:
+
+            return Response(
+                {
+                    "success": False,
+                    "message": result["message"]
+                },
+                status=result["status"]
+            )
+
+        return Response(
+            result["data"],
+            status=200
+        )

@@ -453,3 +453,276 @@ class EnrollmentService:
                 "status": 500,
                 "message": str(ex)
             }
+
+    @staticmethod
+    def bulk_by_users(
+        users,
+        action,
+        course_ids
+    ):
+
+        if not users:
+            return {
+                "success": False,
+                "status": 400,
+                "message": "users is required"
+            }
+
+        if action not in [
+            "assign",
+            "unassign"
+        ]:
+            return {
+                "success": False,
+                "status": 400,
+                "message": (
+                    "action must be "
+                    "assign or unassign"
+                )
+            }
+
+        if not course_ids:
+            return {
+                "success": False,
+                "status": 400,
+                "message": "courseIds is required"
+            }
+
+        try:
+
+            users_map = {
+                user.username: user
+                for user in User.objects.filter(
+                    username__in=users
+                )
+            }
+
+            course_keys_map = {}
+
+            for course_id in course_ids:
+
+                try:
+
+                    course_keys_map[
+                        course_id
+                    ] = CourseKey.from_string(
+                        course_id
+                    )
+
+                except Exception:
+                    pass
+
+            valid_course_keys = list(
+                course_keys_map.values()
+            )
+
+            existing_courses = {
+                str(course.id): course.id
+                for course in (
+                    CourseOverview.objects.filter(
+                        id__in=valid_course_keys
+                    )
+                )
+            }
+
+            valid_user_ids = [
+                user.id
+                for user in users_map.values()
+            ]
+
+            enrollment_set = {
+                (
+                    enrollment.user_id,
+                    str(enrollment.course_id)
+                )
+                for enrollment in (
+                    CourseEnrollment.objects.filter(
+                        user_id__in=valid_user_ids,
+                        course_id__in=existing_courses.values()
+                    )
+                )
+            }
+
+            processed = 0
+            assigned = 0
+            unassigned = 0
+            skipped = 0
+            failed = 0
+
+            details = []
+
+            for username in users:
+
+                user = users_map.get(
+                    username
+                )
+
+                if not user:
+
+                    failed += 1
+
+                    details.append({
+                        "user": username,
+                        "success": False,
+                        "message": "User not found"
+                    })
+
+                    continue
+
+                user_processed = 0
+                user_assigned = 0
+                user_unassigned = 0
+                user_skipped = 0
+                user_failed = 0
+
+                errors = []
+
+                for course_id in course_ids:
+
+                    course_key = (
+                        course_keys_map.get(
+                            course_id
+                        )
+                    )
+
+                    if (
+                        not course_key
+                        or str(course_key)
+                        not in existing_courses
+                    ):
+
+                        user_failed += 1
+
+                        errors.append({
+                            "courseId": course_id,
+                            "error": "Course not found"
+                        })
+
+                        continue
+
+                    try:
+
+                        enrollment_key = (
+                            user.id,
+                            str(course_key)
+                        )
+
+                        is_enrolled = (
+                            enrollment_key
+                            in enrollment_set
+                        )
+
+                        if action == "assign":
+
+                            if is_enrolled:
+
+                                user_skipped += 1
+                                continue
+
+                            CourseEnrollment.enroll(
+                                user,
+                                course_key
+                            )
+
+                            enrollment_set.add(
+                                enrollment_key
+                            )
+
+                            user_assigned += 1
+                            user_processed += 1
+
+                        else:
+
+                            if not is_enrolled:
+
+                                user_skipped += 1
+                                continue
+
+                            CourseEnrollment.unenroll(
+                                user,
+                                course_key
+                            )
+
+                            enrollment_set.discard(
+                                enrollment_key
+                            )
+
+                            user_unassigned += 1
+                            user_processed += 1
+
+                    except Exception as ex:
+
+                        user_failed += 1
+
+                        errors.append({
+                            "courseId": course_id,
+                            "error": str(ex)
+                        })
+
+                processed += (
+                    user_processed
+                )
+
+                assigned += (
+                    user_assigned
+                )
+
+                unassigned += (
+                    user_unassigned
+                )
+
+                skipped += (
+                    user_skipped
+                )
+
+                failed += (
+                    user_failed
+                )
+
+                details.append({
+                    "user": username,
+                    "success": (
+                        user_failed == 0
+                    ),
+                    "processed": (
+                        user_processed
+                    ),
+                    "assigned": (
+                        user_assigned
+                    ),
+                    "unassigned": (
+                        user_unassigned
+                    ),
+                    "skipped": (
+                        user_skipped
+                    ),
+                    "failed": (
+                        user_failed
+                    ),
+                    "errors": errors
+                })
+
+            return {
+                "success": True,
+                "status": 200,
+                "data": {
+                    "success": True,
+                    "action": action,
+                    "totalUsers": len(users),
+                    "totalCourses": len(course_ids),
+                    "processed": processed,
+                    "assigned": assigned,
+                    "unassigned": unassigned,
+                    "skipped": skipped,
+                    "failed": failed,
+                    "details": details
+                }
+            }
+
+        except Exception as ex:
+
+            return {
+                "success": False,
+                "status": 500,
+                "message": str(ex)
+            }
