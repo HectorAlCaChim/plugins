@@ -7,6 +7,34 @@ from oauth2_provider.contrib.rest_framework import OAuth2Authentication
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 
 from custom_api.services.user_service import UserService
+from drf_yasg.utils import swagger_auto_schema
+from custom_api.serializers.CreateUserRequestSerializer import (
+    CreateUserRequestSerializer
+)
+
+from custom_api.serializers.UpdateUserRequestSerializer import (
+    UpdateUserRequestSerializer
+)
+
+from custom_api.serializers.UserPasswordRequestSerializer import (
+    UserPasswordRequestSerializer
+)
+
+from custom_api.serializers.UserProfileRequestSerializer import (
+    UserProfileRequestSerializer
+)
+
+from custom_api.serializers.UserStatusRequestSerializer import (
+    UserStatusRequestSerializer
+)
+
+from custom_api.serializers.BulkUserStatusItemSerializer import (
+    BulkUserStatusRequestSerializer
+)
+
+from custom_api.serializers.course_access_role_serializer import (
+    CourseAccessRoleRequestSerializer
+)
 
 class AuthDebugView(APIView):
     permission_classes = [AllowAny]
@@ -25,6 +53,9 @@ class UserProfileAPIView(APIView):
     authentication_classes = [OAuth2Authentication]
     permission_classes = [IsAuthenticated]
 
+    @swagger_auto_schema(
+        request_body=UserProfileRequestSerializer
+    )
     def post(self, request, user_id):
 
         if not request.user.is_staff:
@@ -125,6 +156,9 @@ class UserStatusAPIView(APIView):
     authentication_classes = [OAuth2Authentication]
     permission_classes = [IsAuthenticated]
 
+    @swagger_auto_schema(
+        request_body=UserStatusRequestSerializer
+    )
     def patch(self, request, user_id):
 
         is_active = request.data.get("isActive")
@@ -155,8 +189,12 @@ class BulkUserStatusAPIView(APIView):
     authentication_classes = [OAuth2Authentication]
     permission_classes = [IsAuthenticated]
 
+    @swagger_auto_schema(
+        request_body=BulkUserStatusRequestSerializer
+    )
     def patch(self, request):
 
+        users = request.data.get("users")
         if not users:
             return Response({
                 "success": False,
@@ -178,6 +216,9 @@ class CreateUserAPIView(APIView):
     authentication_classes = [OAuth2Authentication]
     permission_classes = [IsAuthenticated]
 
+    @swagger_auto_schema(
+        request_body=CreateUserRequestSerializer
+    )
     def post(self, request):
 
         result = UserService.create_user(
@@ -210,6 +251,9 @@ class UpdateUserAPIView(APIView):
     authentication_classes = [OAuth2Authentication]
     permission_classes = [IsAuthenticated]
 
+    @swagger_auto_schema(
+        request_body=UpdateUserRequestSerializer
+    )
     def put(self, request, user_id):
 
 
@@ -419,7 +463,9 @@ class UserPasswordAPIView(APIView):
 
     #authentication_classes = [JwtAuthentication]
     #permission_classes = [IsAuthenticated]
-
+    @swagger_auto_schema(
+        request_body=UserPasswordRequestSerializer
+    )
     authentication_classes = [OAuth2Authentication]
     permission_classes = [IsAuthenticated]
 
@@ -462,10 +508,13 @@ class CourseAccessRoleAPIView(APIView):
     authentication_classes = [OAuth2Authentication]
     permission_classes = [IsAuthenticated]
 
+    @swagger_auto_schema(
+        request_body=CourseAccessRoleRequestSerializer
+    )
     def post(self, request):
 
         result = (
-            CourseAccessRoleService.add_course_access_role(
+            UserService.add_course_access_role(
                 open_edx_user_id=request.data.get(
                     "openEdxUserId"
                 ),
