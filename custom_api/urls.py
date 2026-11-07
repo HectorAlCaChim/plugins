@@ -1,6 +1,7 @@
 from django.urls import path
 from custom_api.views.enrollments import (
-    BulkCourseEnrollmentAPIView
+    BulkCourseEnrollmentAPIView,
+    BulkUsersCourseEnrollmentAPIView
 )
 from custom_api.views.grades import (
     StudentGradesAPIView
@@ -125,6 +126,12 @@ urlpatterns = [
         "users/course-enrollments/bulk/",
         BulkCourseEnrollmentAPIView.as_view(),
         name="bulk_course_enrollment"
+    ),
+    #21 Asignación y Desasignación Masiva de Cursos para Múltiples Usuarios
+    path(
+        "users/course-enrollments/users-bulk/",
+        BulkUsersCourseEnrollmentAPIView.as_view(),
+        name="bulk_users_course_enrollment"
     ),
     #8 Consultar todos los instructores de los cursos proporcionados
     path(

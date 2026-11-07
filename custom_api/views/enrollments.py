@@ -49,3 +49,45 @@ class BulkCourseEnrollmentAPIView(APIView):
             },
             status=200
         )
+
+class BulkUsersCourseEnrollmentAPIView(
+    APIView
+):
+
+    authentication_classes = [
+        OAuth2Authentication
+    ]
+
+    permission_classes = [
+        IsAuthenticated
+    ]
+
+    def post(
+        self,
+        request
+    ):
+
+        result = (
+            EnrollmentService
+            .bulk_users_course_enrollment(
+                request.data.get("users")
+            )
+        )
+
+        if not result["success"]:
+
+            return Response(
+                {
+                    "success": False,
+                    "message": result["message"]
+                },
+                status=result["status"]
+            )
+
+        return Response(
+            {
+                "success": True,
+                **result["data"]
+            },
+            status=200
+        )
