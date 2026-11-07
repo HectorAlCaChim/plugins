@@ -4,7 +4,8 @@ from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
 from opaque_keys.edx.keys import CourseKey
 from common.djangoapps.student.models import CourseAccessRole
-
+import secrets
+import string
 User = get_user_model()
 from common.djangoapps.student.roles import (
     CourseInstructorRole,
@@ -345,13 +346,6 @@ class UserService:
                 "message": "userName is required"
             }
 
-        if not password:
-            return {
-                "success": False,
-                "status": 400,
-                "message": "password is required"
-            }
-
         if not first_name:
             return {
                 "success": False,
@@ -410,7 +404,26 @@ class UserService:
                     is_active=is_active
                 )
 
-                user.set_password(password)
+                generated_password = None
+
+                if (
+                    password is None
+                    or str(password).strip() == ""
+                ):
+
+                    generated_password = (
+                        UserService.generate_password()
+                    )
+
+                    user.set_password(
+                        generated_password
+                    )
+
+                else:
+
+                    user.set_password(
+                        password
+                    )
 
                 user.save()
 
@@ -480,14 +493,6 @@ class UserService:
                 "status": 400,
                 "message": "userName is required"
             }
-
-        if not password:
-            return {
-                "success": False,
-                "status": 400,
-                "message": "password is required"
-            }
-
         if not first_name:
             return {
                 "success": False,
@@ -552,8 +557,26 @@ class UserService:
                 user.is_staff = is_staff
                 user.is_active = is_active
 
-                user.set_password(password)
+                generated_password = None
 
+                if (
+                    password is None
+                    or str(password).strip() == ""
+                ):
+
+                    generated_password = (
+                        UserService.generate_password()
+                    )
+
+                    user.set_password(
+                        generated_password
+                    )
+
+                else:
+
+                    user.set_password(
+                        password
+                    )
                 user.save()
 
                 return {
@@ -1200,3 +1223,25 @@ class UserService:
                 "status": 500,
                 "message": str(ex)
             }
+
+    @staticmethod
+    def generate_password(length=12):
+
+        chars = (
+            string.ascii_uppercase +
+            string.ascii_lowercase +
+            string.digits +
+            "!@#$%&*"
+        )
+
+        password = (
+            secrets.choice(string.ascii_uppercase)
+            + secrets.choice(string.ascii_lowercase)
+            + secrets.choice(string.digits)
+            + secrets.choice("!@#$%&*")
+        )
+
+        for _ in range(length - 4):
+            password += secrets.choice(chars)
+
+        return password

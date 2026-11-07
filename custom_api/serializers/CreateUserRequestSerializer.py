@@ -10,7 +10,7 @@ class CreateUserRequestSerializer(
     )
 
     password = serializers.CharField(
-        required=True
+        required=False
     )
 
     firstName = serializers.CharField(
