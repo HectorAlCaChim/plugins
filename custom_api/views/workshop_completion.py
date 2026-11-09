@@ -2,8 +2,9 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 
-from custom_api.serializers.WorkshopCompletionRequestSerializer import (
-    WorkshopCompletionRequestSerializer
+from custom_api.serializers.WorkshopCompletionUserSerializer import (
+    WorkshopCompletionRequestSerializer,
+    WorkshopCompletionUserSerializer
 )
 
 from custom_api.services.workshop_completion_service import (
