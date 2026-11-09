@@ -31,6 +31,9 @@ from custom_api.views.users import (
 from custom_api.views.instructors import (
     InstructorSearchAPIView
 )
+from .views.workshop_completion import (
+    WorkshopCompletionView
+)
 urlpatterns = [
     #18. Crear perfil de usuario
     #20. actualizar el nombre del perfil
@@ -162,5 +165,11 @@ urlpatterns = [
         "users/course-access-role/",
         CourseAccessRoleAPIView.as_view(),
         name="course_access_role"
-    )
+    ),
+    # SE CONSULTAN LAS CALIFICACIONES REFACTORIZACION
+    path(
+        "users/workshop-completion-status",
+        WorkshopCompletionView.as_view(),
+        name="workshop-completion-status"
+    ),
 ]
