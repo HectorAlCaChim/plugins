@@ -31,7 +31,7 @@ from custom_api.views.users import (
 from custom_api.views.instructors import (
     InstructorSearchAPIView
 )
-from .views.workshop_completion import (
+from custom_api.views.workshop_completion import (
     WorkshopCompletionView
 )
 urlpatterns = [

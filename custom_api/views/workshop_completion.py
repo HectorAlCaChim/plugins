@@ -2,15 +2,13 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 
-from ..serializers.workshop_completion import (
+from custom_api.serializers.WorkshopCompletionRequestSerializer import (
     WorkshopCompletionRequestSerializer
 )
 
-from ..services.workshop_completion_service import (
+from custom_api.services.workshop_completion_service import (
     WorkshopCompletionService
 )
-
-
 class WorkshopCompletionView(APIView):
 
     def post(self, request):
