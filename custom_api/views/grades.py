@@ -10,6 +10,15 @@ from custom_api.services.grade_service import (
     GradeService
 )
 
+from custom_api.serializers.WorkshopGroupCompletionSerializer import (
+    WorkshopCompletionGroupBulkRequestSerializer,
+    WorkshopCompletionGroupBulkUserSerializer
+    
+)
+
+from custom_api.services.workshop_group_completion_service import (
+    WorkshopCompletionGroupBulkService
+)
 
 class StudentGradesAPIView(APIView):
 
@@ -41,4 +50,36 @@ class StudentGradesAPIView(APIView):
         return Response(
             result["data"],
             status=200
+        )
+
+class WorkshopCompletionBulkView(
+    APIView
+):
+
+    def post(
+        self,
+        request
+    ):
+
+        serializer = (
+            WorkshopCompletionBulkRequestSerializer(
+                data=request.data
+            )
+        )
+
+        serializer.is_valid(
+            raise_exception=True
+        )
+
+        result = (
+            WorkshopCompletionBulkService
+                .get_completion_status(
+                    serializer.validated_data["users"],
+                    serializer.validated_data["passingGrade"]
+                )
+        )
+
+        return Response(
+            result,
+            status=status.HTTP_200_OK
         )

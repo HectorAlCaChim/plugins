@@ -13,6 +13,9 @@ from custom_api.views.courses import (
     SearchCoursesAPIView,
     CoursesByDisplayNamesAPIView
 )
+from custom_api.views.workshop_group_completion import (
+    WorkshopCompletionGroupBulkAPIView
+)
 from custom_api.views.users import (
     UserStatusAPIView,
     BulkUserStatusAPIView,
@@ -65,6 +68,11 @@ urlpatterns = [
         "grades/student/",
         StudentGradesAPIView.as_view(),
         name="student_grades"
+    ),
+    path(
+        "grades/group/student/",
+        WorkshopCompletionGroupBulkAPIView.as_view(),
+        name="workshop_completion_status_bulk"
     ),
     #16. Consultar cursos por nombre de taller
     path(
