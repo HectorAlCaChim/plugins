@@ -48,6 +48,6 @@ class WorkshopCompletionGroupBulkAPIView(
         )
 
         return Response(
-            result,
+            result["data"],
             status=status.HTTP_200_OK
         )
