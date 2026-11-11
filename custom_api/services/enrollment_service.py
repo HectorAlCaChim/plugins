@@ -146,6 +146,118 @@ class EnrollmentService:
             }
 
     @staticmethod
+    def bulk_all_courses_user(
+        action,
+        username=None,
+        email=None
+    ):
+
+        if action not in [
+            "assign",
+            "unassign"
+        ]:
+            return {
+                "success": False,
+                "status": 400,
+                "message": (
+                    "action must be "
+                    "assign or unassign"
+                )
+            }
+
+        try:
+
+            user = None
+
+            if username:
+                user = User.objects.filter(
+                    username=username
+                ).first()
+
+            elif email:
+                user = User.objects.filter(
+                    email=email
+                ).first()
+
+            if not user:
+                return {
+                    "success": False,
+                    "status": 404,
+                    "message": "User not found"
+                }
+
+            enrollments = (
+                CourseEnrollment.objects
+                .filter(
+                    user=user
+                )
+            )
+
+            processed = 0
+            failed = 0
+
+            errors = []
+
+            for enrollment in enrollments:
+
+                try:
+
+                    if action == "assign":
+
+                        if not enrollment.is_active:
+
+                            CourseEnrollment.enroll(
+                                user,
+                                enrollment.course_id
+                            )
+
+                            processed += 1
+
+                    else:
+
+                        if enrollment.is_active:
+
+                            CourseEnrollment.unenroll(
+                                user,
+                                enrollment.course_id
+                            )
+
+                            processed += 1
+
+                except Exception as ex:
+
+                    failed += 1
+
+                    errors.append({
+                        "courseId":
+                            str(
+                                enrollment.course_id
+                            ),
+                        "error":
+                            str(ex)
+                    })
+
+            return {
+                "success": True,
+                "status": 200,
+                "data": {
+                    "user": user.username,
+                    "action": action,
+                    "processed": processed,
+                    "failed": failed,
+                    "errors": errors
+                }
+            }
+
+        except Exception as ex:
+
+            return {
+                "success": False,
+                "status": 500,
+                "message": str(ex)
+            }
+
+    @staticmethod
     def bulk_users_course_enrollment(users):
 
         if not users:

@@ -5,7 +5,9 @@ from oauth2_provider.contrib.rest_framework import OAuth2Authentication
 from edx_rest_framework_extensions.auth.jwt.authentication import (
     JwtAuthentication
 )
-
+from custom_api.serializers.BulkAllCoursesUserSerializer import (
+    BulkAllCoursesUserSerializer
+)
 from custom_api.services.enrollment_service import (
     EnrollmentService
 )
@@ -132,4 +134,56 @@ class BulkUsersSharedCoursesAPIView(APIView):
         return Response(
             result["data"],
             status=200
+        )
+
+
+class BulkAllCoursesUserAPIView(
+    APIView
+):
+
+    authentication_classes = [
+        OAuth2Authentication
+    ]
+
+    permission_classes = [
+        IsAuthenticated
+    ]
+
+    def post(
+        self,
+        request
+    ):
+
+        serializer = (
+            BulkAllCoursesUserSerializer(
+                data=request.data
+            )
+        )
+
+        serializer.is_valid(
+            raise_exception=True
+        )
+
+        result = (
+            EnrollmentService
+                .bulk_all_courses_user(
+                    action=
+                        serializer
+                        .validated_data["action"],
+                    username=
+                        serializer
+                        .validated_data.get(
+                            "user"
+                        ),
+                    email=
+                        serializer
+                        .validated_data.get(
+                            "email"
+                        )
+                )
+        )
+
+        return Response(
+            result,
+            status=result["status"]
         )
