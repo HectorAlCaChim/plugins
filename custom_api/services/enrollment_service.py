@@ -1,6 +1,7 @@
 from django.contrib.auth import get_user_model
 
 from opaque_keys.edx.keys import CourseKey
+from django.db import transaction
 
 from common.djangoapps.student.models import (
     CourseEnrollment
