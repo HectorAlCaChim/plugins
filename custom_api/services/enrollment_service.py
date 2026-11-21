@@ -292,7 +292,6 @@ class EnrollmentService:
                             course_id
                             not in course_keys_map
                         ):
-
                             course_keys_map[
                                 course_id
                             ] = (
@@ -325,11 +324,12 @@ class EnrollmentService:
                 for user in users_map.values()
             ]
 
+            # Cambiado para guardar el enrollment completo
             existing_enrollments = {
                 (
                     enrollment.user_id,
                     str(enrollment.course_id)
-                )
+                ): enrollment
                 for enrollment in (
                     CourseEnrollment.objects.filter(
                         user_id__in=user_ids,
@@ -454,47 +454,123 @@ class EnrollmentService:
                             str(course_key)
                         )
 
-                        is_enrolled = (
-                            enrollment_key
-                            in existing_enrollments
+                        existing_enrollment = (
+                            existing_enrollments.get(
+                                enrollment_key
+                            )
                         )
 
+                        # ASSIGN
                         if action == "assign":
 
-                            if is_enrolled:
-
+                            # Ya activo
+                            if (
+                                existing_enrollment
+                                and existing_enrollment.is_active
+                            ):
                                 user_skipped += 1
+                                continue
+
+                            # Existe pero está inactivo
+                            if (
+                                existing_enrollment
+                                and not existing_enrollment.is_active
+                            ):
+
+                                with transaction.atomic():
+
+                                    enrollment = (
+                                        CourseEnrollment.objects
+                                        .select_for_update()
+                                        .get(
+                                            id=existing_enrollment.id
+                                        )
+                                    )
+
+                                    if not enrollment.is_active:
+
+                                        enrollment.is_active = True
+
+                                        enrollment.save(
+                                            update_fields=[
+                                                "is_active"
+                                            ]
+                                        )
+
+                                    existing_enrollments[
+                                        enrollment_key
+                                    ] = enrollment
+
+                                user_assigned += 1
+                                user_processed += 1
 
                                 continue
 
-                            CourseEnrollment.enroll(
-                                user,
-                                course_key
-                            )
+                            # No existe enrollment
+                            with transaction.atomic():
 
-                            existing_enrollments.add(
-                                enrollment_key
-                            )
+                                result = (
+                                    CourseEnrollment.enroll(
+                                        user,
+                                        course_key
+                                    )
+                                )
+
+                                if isinstance(
+                                    result,
+                                    tuple
+                                ):
+                                    enrollment = result[0]
+                                else:
+                                    enrollment = result
+
+                                if not enrollment:
+
+                                    enrollment = (
+                                        CourseEnrollment.objects.get(
+                                            user=user,
+                                            course_id=course_key
+                                        )
+                                    )
+
+                                existing_enrollments[
+                                    enrollment_key
+                                ] = enrollment
 
                             user_assigned += 1
                             user_processed += 1
 
+                        # UNASSIGN
                         else:
 
-                            if not is_enrolled:
+                            if (
+                                not existing_enrollment
+                                or not existing_enrollment.is_active
+                            ):
 
                                 user_skipped += 1
-
                                 continue
 
-                            CourseEnrollment.unenroll(
-                                user,
-                                course_key
-                            )
+                            with transaction.atomic():
 
-                            existing_enrollments.discard(
-                                enrollment_key
-                            )
+                                enrollment = (
+                                    CourseEnrollment.objects
+                                    .select_for_update()
+                                    .get(
+                                        id=existing_enrollment.id
+                                    )
+                                )
+
+                                if enrollment.is_active:
+
+                                    CourseEnrollment.unenroll(
+                                        user,
+                                        course_key
+                                    )
+
+                                existing_enrollments[
+                                    enrollment_key
+                                ] = enrollment
 
                             user_unassigned += 1
                             user_processed += 1
@@ -565,6 +641,7 @@ class EnrollmentService:
                 "status": 500,
                 "message": str(ex)
             }
+
 
     @staticmethod
     def bulk_by_users(
