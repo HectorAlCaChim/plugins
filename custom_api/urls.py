@@ -74,7 +74,7 @@ urlpatterns = [
         name="student_grades"
     ),
     path(
-        "course-access-role/<int:role_id>/",
+        "course-access-role/user/",
         CourseAccessRoleUpdateAPIView.as_view(),
         name="course_access_role_update"
     ),

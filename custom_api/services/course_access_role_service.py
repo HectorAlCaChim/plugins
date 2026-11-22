@@ -1,4 +1,8 @@
+from django.contrib.auth.models import User
 from django.db import transaction
+
+from opaque_keys.edx.keys import CourseKey
+
 from common.djangoapps.student.models import CourseAccessRole
 
 
@@ -6,30 +10,71 @@ class CourseAccessRoleService(object):
 
     @staticmethod
     @transaction.atomic
-    def update_role(role_id, new_role):
-
+    def update_user_course_access_role(
+        open_edx_user_id,
+        new_role
+    ):
         try:
-            access_role = CourseAccessRole.objects.select_for_update().get(
-                pk=role_id
+
+            if not open_edx_user_id:
+                return {
+                    "success": False,
+                    "status": 400,
+                    "message": "openEdxUserId is required"
+                }
+
+            if not new_role:
+                return {
+                    "success": False,
+                    "status": 400,
+                    "message": "newRole is required"
+                }
+
+            new_role = new_role.lower().strip()
+
+            if new_role not in ["student", "instructor"]:
+                return {
+                    "success": False,
+                    "status": 400,
+                    "message": "Invalid role"
+                }
+
+            user = User.objects.filter(
+                id=open_edx_user_id
+            ).first()
+
+            if not user:
+                return {
+                    "success": False,
+                    "status": 404,
+                    "message": "User not found"
+                }
+
+            updated_count = (
+                CourseAccessRole.objects
+                .filter(
+                    user_id=open_edx_user_id
+                )
+                .update(
+                    role=new_role
+                )
             )
 
-        except CourseAccessRole.DoesNotExist:
-            raise ValueError("ROLE_ASSIGNMENT_NOT_FOUND")
+            return {
+                "success": True,
+                "status": 200,
+                "message": "Roles updated successfully",
+                "data": {
+                    "userId": open_edx_user_id,
+                    "newRole": new_role,
+                    "updatedRecords": updated_count
+                }
+            }
 
-        if access_role.role == new_role:
-            return
+        except Exception as ex:
 
-        duplicate_exists = CourseAccessRole.objects.filter(
-            user=access_role.user,
-            course_id=access_role.course_id,
-            org=access_role.org,
-            role=new_role
-        ).exclude(
-            pk=access_role.id
-        ).exists()
-
-        if duplicate_exists:
-            raise ValueError("DUPLICATE_ROLE_ASSIGNMENT")
-
-        access_role.role = new_role
-        access_role.save(update_fields=["role"])
+            return {
+                "success": False,
+                "status": 500,
+                "message": str(ex)
+            }
