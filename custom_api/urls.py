@@ -5,6 +5,9 @@ from custom_api.views.enrollments import (
     BulkUsersSharedCoursesAPIView,
     BulkAllCoursesUserAPIView
 )
+from custom_api.views.course_acccess_role import (
+    CourseAccessRoleUpdateAPIView
+)
 from custom_api.views.grades import (
     StudentGradesAPIView
 )
@@ -69,6 +72,11 @@ urlpatterns = [
         "grades/student/",
         StudentGradesAPIView.as_view(),
         name="student_grades"
+    ),
+    path(
+        "course-access-role/<int:role_id>/",
+        CourseAccessRoleUpdateAPIView.as_view(),
+        name="course_access_role_update"
     ),
     path(
         "grades/group/student/",
