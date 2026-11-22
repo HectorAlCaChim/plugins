@@ -1,5 +1,5 @@
 from django.db import transaction
-from student.models import CourseAccessRole
+from common.djangoapps.student.models import CourseAccessRole
 
 
 class CourseAccessRoleService(object):
