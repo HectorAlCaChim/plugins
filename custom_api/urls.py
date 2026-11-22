@@ -5,7 +5,7 @@ from custom_api.views.enrollments import (
     BulkUsersSharedCoursesAPIView,
     BulkAllCoursesUserAPIView
 )
-from custom_api.views.course_acccess_role import (
+from custom_api.views.course_access_role import (
     CourseAccessRoleUpdateAPIView
 )
 from custom_api.views.grades import (
