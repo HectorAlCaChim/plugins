@@ -2,7 +2,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
-
+from drf_yasg.utils import swagger_auto_schema
 from oauth2_provider.contrib.rest_framework import (
     OAuth2Authentication
 )
@@ -19,14 +19,9 @@ from custom_api.services.workshop_group_completion_service import (
 class WorkshopCompletionGroupBulkAPIView(
     APIView
 ):
-    authentication_classes = [
-        OAuth2Authentication
-    ]
-
-    permission_classes = [
-        IsAuthenticated
-    ]
-
+    @swagger_auto_schema(
+        request_body=WorkshopCompletionGroupBulkRequestSerializer
+    )
     def post(self, request):
 
         serializer = (

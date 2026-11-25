@@ -1,7 +1,7 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-
+from drf_yasg.utils import swagger_auto_schema
 from custom_api.serializers.WorkshopCompletionUserSerializer import (
     WorkshopCompletionRequestSerializer,
     WorkshopCompletionUserSerializer
@@ -12,6 +12,9 @@ from custom_api.services.workshop_completion_service import (
 )
 class WorkshopCompletionView(APIView):
 
+    @swagger_auto_schema(
+        request_body=WorkshopCompletionRequestSerializer
+    )
     def post(self, request):
 
         serializer = (
