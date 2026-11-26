@@ -15,7 +15,8 @@ from custom_api.views.courses import (
     CourseNamesAPIView,
     ActiveCoursesAPIView,
     SearchCoursesAPIView,
-    CoursesByDisplayNamesAPIView
+    CoursesByDisplayNamesAPIView,
+    FindCourseByIdAPIView
 )
 from custom_api.views.workshop_group_completion import (
     WorkshopCompletionGroupBulkAPIView
@@ -194,5 +195,10 @@ urlpatterns = [
         "users/workshop-completion-status",
         WorkshopCompletionView.as_view(),
         name="workshop-completion-status"
+    ),
+    re_path(
+        r"^find-course-by-id/(?P<course_id>.+)/$",
+        FindCourseByIdAPIView.as_view(),
+        name="find-course-by-id"
     ),
 ]

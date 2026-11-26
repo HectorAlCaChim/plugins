@@ -275,3 +275,63 @@ class CourseService:
                 "message": str(ex)
             }
     
+    
+    @staticmethod
+    def get_course_by_id(course_id):
+        """
+        Obtiene un curso por su identificador
+        completo de Open edX.
+
+        Ejemplo:
+        course-v1:LED-2026-05+FINAN-002E+BW
+        """
+
+        try:
+
+            if not course_id:
+                return {
+                    "success": False,
+                    "status": 400,
+                    "message": "courseId is required"
+                }
+
+            course = (
+                CourseOverview.objects
+                .filter(id=course_id)
+                .first()
+            )
+
+            if course is None:
+
+                return {
+                    "success": False,
+                    "status": 404,
+                    "message": "No existe el curso solicitado."
+                }
+
+            return {
+                "success": True,
+                "status": 200,
+                "data": {
+                    "id": str(course.id),
+                    "name": course.display_name,
+                    "org": getattr(course.id, "org", None),
+                    "shortDescription": getattr(
+                        course,
+                        "short_description",
+                        None
+                    ),
+                    "start": course.start,
+                    "end": course.end,
+                    "enrollmentStart": course.enrollment_start,
+                    "enrollmentEnd": course.enrollment_end
+                }
+            }
+
+        except Exception as ex:
+
+            return {
+                "success": False,
+                "status": 500,
+                "message": str(ex)
+            }

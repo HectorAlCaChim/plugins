@@ -3,7 +3,8 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from oauth2_provider.contrib.rest_framework import OAuth2Authentication
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
-
+from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
 from custom_api.services.course_service import CourseService
 
 class SearchCoursesAPIView(APIView):
@@ -122,6 +123,76 @@ class CoursesByDisplayNamesAPIView(APIView):
                 {
                     "success": False,
                     "message": result["message"]
+                },
+                status=result["status"]
+            )
+
+        return Response(
+            result["data"],
+            status=200
+        )
+
+
+class FindCourseByIdAPIView(APIView):
+
+    #authentication_classes = [OAuth2Authentication]
+    #permission_classes = [IsAuthenticated]
+    @swagger_auto_schema(
+        operation_summary="Consultar un curso por su identificador",
+        operation_description=(
+            "Consulta un curso de Open edX mediante su identificador completo."
+        ),
+        manual_parameters=[
+            openapi.Parameter(
+                name="course_id",
+                in_=openapi.IN_PATH,
+                description=(
+                    "Identificador completo del curso. "
+                    "Ejemplo: course-v1:LED-2026-05+FINAN-002E+BW"
+                ),
+                type=openapi.TYPE_STRING,
+                required=True
+            )
+        ]
+    )
+    def get(self, request, course_id):
+
+        if not course_id:
+
+            return Response(
+                {
+                    "detail": "El identificador tiene un formato inválido."
+                },
+                status=400
+            )
+
+        result = CourseService.get_course_by_id(
+            course_id
+        )
+
+        if not result["success"]:
+
+            if result["status"] == 404:
+
+                return Response(
+                    {
+                        "detail": "No existe el curso solicitado."
+                    },
+                    status=404
+                )
+
+            if result["status"] == 400:
+
+                return Response(
+                    {
+                        "detail": "El identificador tiene un formato inválido."
+                    },
+                    status=400
+                )
+
+            return Response(
+                {
+                    "detail": result["message"]
                 },
                 status=result["status"]
             )
